@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 
         pathLine = pathLine.mid(0, pathLine.length() - 1);
         outLines.append(pathLine);
-        outLines.append(QString(minDistance));
+        outLines.append(QString::number(minDistance));
 
         writeToFile(outFilePath, outLines);
     }

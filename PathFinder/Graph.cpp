@@ -19,7 +19,7 @@ void Graph::calculateLabelsFromPoint(QString pointName) {
 	originPointIndex = getPointIndex(pointName);
 	
 	pointLabels.clear();
-	for (int i = 0; i < pointLabels.length(); i++)
+	for (int i = 0; i < pointNames.length(); i++)
 		pointLabels.append(i == originPointIndex ? 0 : INT_MAX);
 
 	QList<int> visitedPointsIndexes;
@@ -55,18 +55,21 @@ QStringList Graph::getMinPathTo(QString pointName) { // length == 0 - not connec
 	
 	int currentIndex = getPointIndex(pointName);
 	while (currentIndex != originPointIndex) {
-		result.append(pointNames[originPointIndex]);
+		result.append(pointNames[currentIndex]);
 		QList<int> distancesToPoints = getConnectedPoints(currentIndex);
 
 		for (int i = 0; i < distancesToPoints.length(); i++)
 			if (pointLabels[i] == pointLabels[currentIndex] - distancesToPoints[i]) {
 				currentIndex = i;
-				continue;
+				break;
 			}
 	}
 
-	if (result.length() != 0)
+	if (result.length() != 0) {
 		result.append(pointNames[originPointIndex]);
+		for (int k = 0, s = result.size(), max = (s / 2); k < max; k++)
+			result.swap(k, s - (1 + k));
+	}
 
 	return result;
 }

@@ -4,8 +4,8 @@
 #include <QList>
 #include "Graph.h"
 
-QList<QString> readFile(QString absolutePath) {
-    QList<QString> result;
+QStringList readFile(QString absolutePath) {
+    QStringList result;
     QFile inputFile(absolutePath);
 
     if (inputFile.open(QIODevice::ReadOnly))

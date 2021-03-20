@@ -24,6 +24,20 @@ QStringList readFile(QString absolutePath) {
     return result;
 }
 
+void writeToFile(QString absolutePath, QStringList lines) {
+    QFile outputFile(absolutePath);
+
+    if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream stream(&outputFile);
+
+        for (int i = 0; i < lines.length(); i++)
+            stream << lines[i] << endl;
+
+        outputFile.close();
+    }
+}
+
 QString getPath(char* path) {
     QString result(path);
 
@@ -41,7 +55,28 @@ int main(int argc, char *argv[]) {
     QString pointsFilePath = getPath(argv[2]);
     QString outFilePath = getPath(argv[3]);
 
+    QStringList fromToPoints = readFile(pointsFilePath)[0].split(QChar(';'));
     Graph& graph = Graph(readFile(graphFilePath));
+    graph.calculateLabelsFromPoint(fromToPoints[0]);
+    
+    int minDistance = graph.getDistanceTo(fromToPoints[1]);
+    QStringList minPath = graph.getMinPathTo(fromToPoints[1]);
+
+    if (minDistance == -1)
+        writeToFile(outFilePath, QStringList(QString("Путь между указанными точками отсутствует")));
+    else {
+        QStringList outLines;
+        QString pathLine;
+
+        for (int i = 0; i < minPath.length(); i++)
+            pathLine += minPath[i] + "-";
+
+        pathLine = pathLine.mid(0, pathLine.length() - 1);
+        outLines.append(pathLine);
+        outLines.append(QString(minDistance));
+
+        writeToFile(outFilePath, outLines);
+    }
     
     return 0;
 }

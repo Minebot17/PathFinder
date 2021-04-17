@@ -4,6 +4,12 @@
 #include <QList>
 #include "Graph.h"
 
+
+/// <summary>
+/// Считывает файл по строкам
+/// </summary>
+/// <param name="absolutePath">Абсолютный путь до файла</param>
+/// <returns>Считанные строки файла</returns>
 QStringList readFile(QString absolutePath) {
     QStringList result;
     QFile inputFile(absolutePath);
@@ -24,6 +30,11 @@ QStringList readFile(QString absolutePath) {
     return result;
 }
 
+/// <summary>
+/// Записывает в файл строки (с перезаписью)
+/// </summary>
+/// <param name="absolutePath">Абсолютный путь до файла</param>
+/// <param name="lines">Строки для записи в файл</param>
 void writeToFile(QString absolutePath, QStringList lines) {
     QFile outputFile(absolutePath);
 
@@ -38,6 +49,11 @@ void writeToFile(QString absolutePath, QStringList lines) {
     }
 }
 
+/// <summary>
+/// Преобразует относительный путь в абсолютный
+/// </summary>
+/// <param name="path">Относительный путь, в начале должна стоять точка</param>
+/// <returns>Абсолютный путь</returns>
 QString getPath(char* path) {
     QString result(path);
 
@@ -47,6 +63,9 @@ QString getPath(char* path) {
     return result;
 }
 
+/// <summary>
+/// Точка входа в программу
+/// </summary>
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
     QTextStream out(stdout);
@@ -57,10 +76,9 @@ int main(int argc, char *argv[]) {
 
     QStringList fromToPoints = readFile(pointsFilePath)[0].split(QChar(';'));
     Graph& graph = Graph(readFile(graphFilePath));
-    graph.calculateLabelsFromPoint(fromToPoints[0]);
     
-    int minDistance = graph.getDistanceTo(fromToPoints[1]);
-    QStringList minPath = graph.getMinPathTo(fromToPoints[1]);
+    int minDistance = graph.getDistanceTo(fromToPoints[0], fromToPoints[1]);
+    QStringList minPath = graph.getMinPathTo(fromToPoints[0], fromToPoints[1]);
 
     if (minDistance == -1)
         writeToFile(outFilePath, QStringList(QString("Путь между указанными точками отсутствует")));

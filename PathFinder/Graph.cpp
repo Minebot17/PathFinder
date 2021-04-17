@@ -16,6 +16,7 @@ Graph::Graph(QStringList lines) {
 }
 
 void Graph::calculateLabelsFromPoint(QString pointName) {
+	originPointName = pointName;
 	originPointIndex = getPointIndex(pointName);
 	
 	pointLabels.clear();
@@ -45,15 +46,20 @@ void Graph::calculateLabelsFromPoint(QString pointName) {
 	}
 }
 
-int Graph::getDistanceTo(QString pointName) { // -1 - not connected
-	int distance = pointLabels[getPointIndex(pointName)];
+int Graph::getDistanceTo(QString fromPointName, QString toPointName) { // -1 - not connected
+	if (originPointName != fromPointName)
+		calculateLabelsFromPoint(fromPointName);
+
+	int distance = pointLabels[getPointIndex(toPointName)];
 	return distance == INT_MAX ? -1 : distance;
 }
 
-QStringList Graph::getMinPathTo(QString pointName) { // length == 0 - not connected
-	QStringList result;
+QStringList Graph::getMinPathTo(QString fromPointName, QString toPointName) { // length == 0 - not connected
+	if (originPointName != fromPointName)
+		calculateLabelsFromPoint(fromPointName);
 	
-	int currentIndex = getPointIndex(pointName);
+	QStringList result;
+	int currentIndex = getPointIndex(toPointName);
 	while (currentIndex != originPointIndex) {
 		result.append(pointNames[currentIndex]);
 		QList<int> distancesToPoints = getConnectedPoints(currentIndex);

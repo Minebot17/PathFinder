@@ -26,10 +26,29 @@ public:
 	QStringList getMinPathTo(QString fromPointName, QString toPointName);
 
 private:
+	/// <summary>
+	/// Последовательный список имён всех точек графа
+	/// </summary>
 	QStringList pointNames;
+
+	/// <summary>
+	/// Взвешенная матрица смежности
+	/// </summary>
 	QList<QList<int>> distancesMatrix;
+
+	/// <summary>
+	/// Индекс точки, откуда производился расчёт по алгоритму Дейкстры
+	/// </summary>
 	int originPointIndex;
+
+	/// <summary>
+	/// Имя точки, откуда производился расчёт по алгоритму Дейкстры
+	/// </summary>
 	QString originPointName;
+
+	/// <summary>
+	/// Список меток, рассчитанных алгоритмом Дейкстры для конкретной точки
+	/// </summary>
 	QList<int> pointLabels;
 
 	/// <summary>

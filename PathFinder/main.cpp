@@ -3,7 +3,9 @@
 #include <QTextStream>
 #include <QList>
 #include "Graph.h"
+#include <regex>
 
+QRegExp rx("*.txt");
 
 /// <summary>
 /// Считывает файл по строкам
@@ -11,8 +13,13 @@
 /// <param name="absolutePath">Абсолютный путь до файла</param>
 /// <returns>Считанные строки файла</returns>
 QStringList readFile(QString absolutePath) {
+    rx.setPatternSyntax(QRegExp::Wildcard);
+
     QStringList result;
     QFile inputFile(absolutePath);
+
+    if (!rx.exactMatch(inputFile.fileName()))
+        throw QString::fromUtf8(u8"Неверно указано расширение файла. Файл должен иметь расширение .txt");
 
     if (inputFile.open(QIODevice::ReadOnly))
     {
@@ -26,6 +33,8 @@ QStringList readFile(QString absolutePath) {
 
         inputFile.close();
     }
+    else
+        throw QString::fromUtf8(u8"Неверно указан файл с входными данными. Возможно, файл не существует");
     
     return result;
 }
@@ -47,6 +56,8 @@ void writeToFile(QString absolutePath, QStringList lines) {
 
         outputFile.close();
     }
+    else
+        throw QString::fromUtf8(u8"Неверно указан файл для выходных данных. Возможно, указанного расположения не существует.");
 }
 
 /// <summary>
@@ -74,26 +85,41 @@ int main(int argc, char *argv[]) {
     QString pointsFilePath = getPath(argv[2]);
     QString outFilePath = getPath(argv[3]);
 
-    QStringList fromToPoints = readFile(pointsFilePath)[0].split(QChar(';'));
-    Graph& graph = Graph(readFile(graphFilePath));
-    
-    int minDistance = graph.getDistanceTo(fromToPoints[0], fromToPoints[1]);
-    QStringList minPath = graph.getMinPathTo(fromToPoints[0], fromToPoints[1]);
+    try {
+        QStringList fromToPoints = readFile(pointsFilePath)[0].split(QChar(';'));
+        if (fromToPoints.length() < 2)
+            throw QString::fromUtf8(u8"Конечная или начальная точка отсутствует во входном файле точек.");
 
-    if (minDistance == -1)
-        writeToFile(outFilePath, QStringList(QString("Путь между указанными точками отсутствует")));
-    else {
-        QStringList outLines;
-        QString pathLine;
+        Graph& graph = Graph(readFile(graphFilePath));
 
-        for (int i = 0; i < minPath.length(); i++)
-            pathLine += minPath[i] + "-";
+        int minDistance = graph.getDistanceTo(fromToPoints[0], fromToPoints[1]);
+        QStringList minPath = graph.getMinPathTo(fromToPoints[0], fromToPoints[1]);
 
-        pathLine = pathLine.mid(0, pathLine.length() - 1);
-        outLines.append(pathLine);
-        outLines.append(QString::number(minDistance));
+        if (minDistance == -1)
+            writeToFile(outFilePath, QStringList(QString::fromUtf8(u8"Путь между указанными точками отсутствует")));
+        else {
+            QStringList outLines;
+            QString pathLine;
 
-        writeToFile(outFilePath, outLines);
+            for (int i = 0; i < minPath.length(); i++)
+                pathLine += minPath[i] + "-";
+
+            pathLine = pathLine.mid(0, pathLine.length() - 1);
+            outLines.append(pathLine);
+            outLines.append(QString::number(minDistance));
+
+            writeToFile(outFilePath, outLines);
+        }
+    }
+    catch (QString str) {
+        try {
+            QStringList outLines;
+            outLines.append(str);
+            writeToFile(outFilePath, outLines);
+        }
+        catch (QString strr) {
+            out << "\n" << strr;
+        }
     }
     
     return 0;

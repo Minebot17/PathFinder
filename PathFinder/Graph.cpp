@@ -4,12 +4,33 @@ Graph::Graph(QStringList lines) {
 	originPointIndex = -1;
 	pointNames = lines[0].split(QChar(';'));
 
+	if (pointNames.length() < 2)
+		throw QString::fromUtf8(u8"“очек в схеме должно быть минимум 2-е или более");
+
+	if (pointNames.length() != lines.length() - 1)
+			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько строк в матрице смежности.  ол-во точек: С%1Т.  ол-во строк С$2Т.")
+				.arg(QString(pointNames.length()), QString(lines.length() - 1));
+
 	for (int i = 1; i < lines.length(); i++) {
 		QStringList lineElements = lines[i].split(QChar(';'));
 		QList<int> matrixLine;
+		
+		if (pointNames.length() != lines.length() - 1)
+			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько элементов в каждой строке матрицы смежности.  ол-во точек: '%1'.  ол-во элементов: С%2Т в строке С%2Т.")
+				.arg(QString(pointNames.length()), QString(lineElements.length()), QString(i));
 
-		for (int j = 0; j < lineElements.length(); j++)
-			matrixLine.append(lineElements[j].toInt());
+		for (int j = 0; j < lineElements.length(); j++) {
+			bool ok;
+			int number = lineElements[j].toInt(&ok);
+			if (!ok || number < 0)
+				throw QString::fromUtf8(u8"Ёлемент матрицы в строке С%1Т под номером С%2Т имеет вид С%3Т. ƒопустимые значени€ элементов Ц только положительные числа.")
+					.arg(QString(i), QString(j+1), lineElements[j]);
+
+			if (i - 1 == j && number != 0)
+				throw QString::fromUtf8(u8"Ќа главной диагонали матрицы рассто€ний может быть значение только У0Ф. “очки не могут быть соединены сами с собой.");
+
+			matrixLine.append(number);
+		}
 
 		distancesMatrix.append(matrixLine);
 	}
@@ -85,6 +106,7 @@ int Graph::getPointIndex(QString pointName) { // -1 if not exists
 		if (pointNames[i] == pointName)
 			return i;
 
+	throw QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек.");
 	return -1;
 }
 

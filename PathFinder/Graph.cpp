@@ -86,7 +86,7 @@ QStringList Graph::getMinPathTo(QString fromPointName, QString toPointName) { //
 		QList<int> distancesToPoints = getConnectedPoints(currentIndex);
 
 		for (int i = 0; i < distancesToPoints.length(); i++)
-			if (pointLabels[i] == pointLabels[currentIndex] - distancesToPoints[i]) {
+			if (distancesToPoints[i] != 0 && pointLabels[i] == pointLabels[currentIndex] - distancesToPoints[i]) {
 				currentIndex = i;
 				break;
 			}

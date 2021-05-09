@@ -21,9 +21,10 @@ QStringList readFile(QString absolutePath) {
     if (!rx.exactMatch(inputFile.fileName()))
         throw QString::fromUtf8(u8"Неверно указано расширение файла. Файл должен иметь расширение .txt");
 
-    if (inputFile.open(QIODevice::ReadOnly))
+    if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream in(&inputFile);
+        in.setCodec("UTF-8");
 
         while (!in.atEnd())
         {
@@ -50,6 +51,8 @@ void writeToFile(QString absolutePath, QStringList lines) {
     if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream stream(&outputFile);
+        stream.setGenerateByteOrderMark(true);
+        stream.setCodec("UTF-8");
 
         for (int i = 0; i < lines.length(); i++)
             stream << lines[i] << endl;
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
         Graph& graph = Graph(readFile(graphFilePath));
 
         int minDistance = graph.getDistanceTo(fromToPoints[0], fromToPoints[1]);
-        QStringList minPath = graph.getMinPathTo(fromToPoints[0], fromToPoints[1]);
+        QStringList minPath = minDistance == -1 ? QStringList() : graph.getMinPathTo(fromToPoints[0], fromToPoints[1]);
 
         if (minDistance == -1)
             writeToFile(outFilePath, QStringList(QString::fromUtf8(u8"Путь между указанными точками отсутствует")));

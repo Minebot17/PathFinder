@@ -95,7 +95,7 @@ QStringList Graph::getMinPathTo(QString fromPointName, QString toPointName) { //
 	if (result.length() != 0) {
 		result.append(pointNames[originPointIndex]);
 		for (int k = 0, s = result.size(), max = (s / 2); k < max; k++)
-			result.swap(k, s - (1 + k));
+			result.swapItemsAt(k, s - (1 + k));
 	}
 
 	return result;
@@ -130,4 +130,12 @@ QList<int> Graph::getConnectedPoints(int toPoint) {
 		result.append(distancesMatrix[i][toPoint]);
 
 	return result;
+}
+
+QStringList Graph::getPointNames() {
+	return pointNames;
+}
+
+QList<QList<int>> Graph::getDistanceMatrix() {
+	return distancesMatrix;
 }

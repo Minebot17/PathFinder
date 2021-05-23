@@ -1,6 +1,6 @@
 #pragma once
 #include <QtCore/QCoreApplication>
-#include <QList>
+
 class Graph
 {
 public: 
@@ -24,6 +24,9 @@ public:
 	/// <param name="pointName"></param>
 	/// <returns>Список имён точек, которые представляют кратчайший путь. Если точки не соедененны, возвращает пустой список</returns>
 	QStringList getMinPathTo(QString fromPointName, QString toPointName);
+
+	QStringList getPointNames();
+	QList<QList<int>> getDistanceMatrix();
 
 private:
 	/// <summary>

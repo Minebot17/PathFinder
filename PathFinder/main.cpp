@@ -1,7 +1,6 @@
 #include <QtCore/QCoreApplication>
 #include <QDir>
 #include <QTextStream>
-#include <QList>
 #include "Graph.h"
 #include <regex>
 

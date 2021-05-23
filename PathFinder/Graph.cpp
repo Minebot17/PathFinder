@@ -8,23 +8,23 @@ Graph::Graph(QStringList lines) {
 		throw QString::fromUtf8(u8"“очек в схеме должно быть минимум 2-е или более");
 
 	if (pointNames.length() != lines.length() - 1)
-			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько строк в матрице смежности.  ол-во точек: С%1Т.  ол-во строк С$2Т.")
-				.arg(QString(pointNames.length()), QString(lines.length() - 1));
+			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько строк в матрице смежности.  ол-во точек: С%1Т.  ол-во строк С%2Т.")
+				.arg(QString::number(pointNames.length()), QString::number(lines.length() - 1));
 
 	for (int i = 1; i < lines.length(); i++) {
 		QStringList lineElements = lines[i].split(QChar(';'));
 		QList<int> matrixLine;
 		
-		if (pointNames.length() != lines.length() - 1)
-			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько элементов в каждой строке матрицы смежности.  ол-во точек: '%1'.  ол-во элементов: С%2Т в строке С%2Т.")
-				.arg(QString(pointNames.length()), QString(lineElements.length()), QString(i));
+		if (pointNames.length() != lineElements.length())
+			throw QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько элементов в каждой строке матрицы смежности.  ол-во точек: '%1'.  ол-во элементов: С%2Т в строке С%3Т.")
+				.arg(QString::number(pointNames.length()), QString::number(lineElements.length()), QString::number(i));
 
 		for (int j = 0; j < lineElements.length(); j++) {
 			bool ok;
 			int number = lineElements[j].toInt(&ok);
 			if (!ok || number < 0)
 				throw QString::fromUtf8(u8"Ёлемент матрицы в строке С%1Т под номером С%2Т имеет вид С%3Т. ƒопустимые значени€ элементов Ц только положительные числа.")
-					.arg(QString(i), QString(j+1), lineElements[j]);
+					.arg(QString::number(i), QString::number(j+1), lineElements[j]);
 
 			if (i - 1 == j && number != 0)
 				throw QString::fromUtf8(u8"Ќа главной диагонали матрицы рассто€ний может быть значение только У0Ф. “очки не могут быть соединены сами с собой.");
@@ -81,6 +81,7 @@ QStringList Graph::getMinPathTo(QString fromPointName, QString toPointName) { //
 	
 	QStringList result;
 	int currentIndex = getPointIndex(toPointName);
+	int iterationsCount = 0;
 	while (currentIndex != originPointIndex) {
 		result.append(pointNames[currentIndex]);
 		QList<int> distancesToPoints = getConnectedPoints(currentIndex);
@@ -90,6 +91,11 @@ QStringList Graph::getMinPathTo(QString fromPointName, QString toPointName) { //
 				currentIndex = i;
 				break;
 			}
+
+		if (iterationsCount > pointNames.length())
+			return {};
+
+		iterationsCount++;
 	}
 
 	if (result.length() != 0) {

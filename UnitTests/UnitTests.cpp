@@ -85,8 +85,8 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8"“очек в схеме должно быть минимум 2-е или более"));
+			catch (GraphError err) {
+				Assert::AreEqual(1, err.errorCode);
 				return;
 			}
 
@@ -103,8 +103,10 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько строк в матрице смежности.  ол-во точек: С2Т.  ол-во строк С1Т."));
+			catch (GraphError err) {
+				Assert::AreEqual(0, err.errorCode);
+				Assert::AreEqual(2, err.data[0]);
+				Assert::AreEqual(1, err.data[1]);
 				return;
 			}
 
@@ -122,8 +124,11 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" ол-во точек должно быть столько же, сколько элементов в каждой строке матрицы смежности.  ол-во точек: '2'.  ол-во элементов: С3Т в строке С2Т."));
+			catch (GraphError err) {
+				Assert::AreEqual(2, err.errorCode);
+				Assert::AreEqual(2, err.data[0]);
+				Assert::AreEqual(3, err.data[1]);
+				Assert::AreEqual(2, err.data[2]);
 				return;
 			}
 
@@ -141,8 +146,10 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8"Ёлемент матрицы в строке С2Т под номером С1Т имеет вид СVolgogradТ. ƒопустимые значени€ элементов Ц только положительные числа."));
+			catch (GraphError err) {
+				Assert::AreEqual(3, err.errorCode);
+				Assert::AreEqual(2, err.data[0]);
+				Assert::AreEqual(1, err.data[1]);
 				return;
 			}
 
@@ -160,8 +167,10 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8"Ёлемент матрицы в строке С1Т под номером С2Т имеет вид С-100Т. ƒопустимые значени€ элементов Ц только положительные числа."));
+			catch (GraphError err) {
+				Assert::AreEqual(3, err.errorCode);
+				Assert::AreEqual(1, err.data[0]);
+				Assert::AreEqual(2, err.data[1]);
 				return;
 			}
 
@@ -179,8 +188,8 @@ namespace UnitTests
 			try {
 				Graph graph(sheme);
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8"Ќа главной диагонали матрицы рассто€ний может быть значение только У0Ф. “очки не могут быть соединены сами с собой."));
+			catch (GraphError err) {
+				Assert::AreEqual(4, err.errorCode);
 				return;
 			}
 
@@ -230,8 +239,8 @@ namespace UnitTests
 			try {
 				graph.getDistanceTo(QString("Rezan"), QString("Moskow"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 
@@ -245,8 +254,8 @@ namespace UnitTests
 			try {
 				graph.getDistanceTo(QString("Moskow"), QString("Rezan"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 
@@ -260,8 +269,8 @@ namespace UnitTests
 			try {
 				graph.getDistanceTo(QString("Rezan"), QString("Nur-Sultan"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 
@@ -341,8 +350,8 @@ namespace UnitTests
 			try {
 				graph.getMinPathTo(QString("Rezan"), QString("Moskow"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 
@@ -356,8 +365,8 @@ namespace UnitTests
 			try {
 				graph.getMinPathTo(QString("Moskow"), QString("Rezan"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 
@@ -371,8 +380,8 @@ namespace UnitTests
 			try {
 				graph.getMinPathTo(QString("Rezan"), QString("Nur-Sultan"));
 			}
-			catch (QString str) {
-				Assert::IsTrue(str == QString::fromUtf8(u8" онечна€ или начальна€ точка не была найдена в списке всех точек."));
+			catch (GraphError err) {
+				Assert::AreEqual(5, err.errorCode);
 				return;
 			}
 

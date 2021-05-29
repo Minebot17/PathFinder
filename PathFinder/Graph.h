@@ -1,6 +1,11 @@
 #pragma once
 #include <QtCore/QCoreApplication>
 
+struct GraphError {
+	int errorCode;
+	int data[10];
+};
+
 class Graph
 {
 public: 

@@ -18,7 +18,7 @@ QStringList readFile(QString absolutePath) {
     QFile inputFile(absolutePath);
 
     if (!rx.exactMatch(inputFile.fileName()))
-        throw QString::fromUtf8(u8"Неверно указано расширение файла. Файл должен иметь расширение .txt");
+        throw GraphError{ 6 };
 
     if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -34,7 +34,7 @@ QStringList readFile(QString absolutePath) {
         inputFile.close();
     }
     else
-        throw QString::fromUtf8(u8"Неверно указан файл с входными данными. Возможно, файл не существует");
+        throw GraphError{ 7 };
     
     return result;
 }
@@ -59,7 +59,7 @@ void writeToFile(QString absolutePath, QStringList lines) {
         outputFile.close();
     }
     else
-        throw QString::fromUtf8(u8"Неверно указан файл для выходных данных. Возможно, указанного расположения не существует.");
+        throw GraphError{ 8 };
 }
 
 /// <summary>
@@ -76,6 +76,37 @@ QString getPath(char* path) {
     return result;
 }
 
+QString getErrorMessage(GraphError err) {
+    switch (err.errorCode)
+    {
+        case 0:
+            return QString::fromUtf8(u8"Кол-во точек должно быть столько же, сколько строк в матрице смежности. Кол-во точек: ‘%1’. Кол-во строк ‘%2’.")
+                .arg(QString::number(err.data[0]), QString::number(err.data[1]));
+        case 1:
+            return QString::fromUtf8(u8"Точек в схеме должно быть минимум 2-е или более.");
+        case 2:
+            return QString::fromUtf8(u8"Кол-во точек должно быть столько же, сколько элементов в каждой строке матрицы смежности. Кол-во точек: '%1'. Кол-во элементов: ‘%2’ в строке ‘%3’.")
+                .arg(QString::number(err.data[0]), QString::number(err.data[1]), QString::number(err.data[2]));
+        case 3:
+            return QString::fromUtf8(u8"Элемент матрицы в строке ‘%1’ под номером ‘%2’ имеет вид ‘%3’. Допустимые значения элементов – только положительные числа.")
+                .arg(QString::number(err.data[0]), QString::number(err.data[1]), QString::number(err.data[2]));
+        case 4:
+            return QString::fromUtf8(u8"На главной диагонали матрицы расстояний может быть значение только “0”. Точки не могут быть соединены сами с собой.");
+        case 5:
+            return QString::fromUtf8(u8"Конечная или начальная точка не была найдена в списке всех точек.");
+        case 6:
+            return QString::fromUtf8(u8"Неверно указано расширение файла. Файл должен иметь расширение .txt");
+        case 7:
+            return QString::fromUtf8(u8"Неверно указан файл с входными данными. Возможно, файл не существует");
+        case 8:
+            return QString::fromUtf8(u8"Неверно указан файл для выходных данных. Возможно, указанного расположения не существует.");
+        case 9:
+            return QString::fromUtf8(u8"Конечная или начальная точка отсутствует во входном файле точек.");
+        default:
+            return QString::fromUtf8(u8"Неизвестная ошибка.");
+    }
+}
+
 /// <summary>
 /// Точка входа в программу
 /// </summary>
@@ -90,7 +121,7 @@ int main(int argc, char *argv[]) {
     try {
         QStringList fromToPoints = readFile(pointsFilePath)[0].split(QChar(';'));
         if (fromToPoints.length() < 2)
-            throw QString::fromUtf8(u8"Конечная или начальная точка отсутствует во входном файле точек.");
+            throw GraphError{ 9 };
 
         Graph& graph = Graph(readFile(graphFilePath));
 
@@ -113,14 +144,14 @@ int main(int argc, char *argv[]) {
             writeToFile(outFilePath, outLines);
         }
     }
-    catch (QString str) {
+    catch (GraphError err) {
         try {
             QStringList outLines;
-            outLines.append(str);
+            outLines.append(getErrorMessage(err));
             writeToFile(outFilePath, outLines);
         }
-        catch (QString strr) {
-            out << "\n" << strr;
+        catch (GraphError err) {
+            out << "\n" << getErrorMessage(err);
         }
     }
     
